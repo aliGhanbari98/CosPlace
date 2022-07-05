@@ -21,6 +21,13 @@ logging.info(" ".join(sys.argv))
 logging.info(f"Arguments: {args}")
 logging.info(f"The outputs are being saved in {output_folder}")
 
+#Arman code
+
+if args.run_arman_code == 1:
+    print("Hello from arman")
+    exit(7)
+
+
 #### Model
 model = network.GeoLocalizationNet(args.backbone, args.fc_output_dim)
 
