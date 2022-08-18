@@ -3,6 +3,7 @@ import torch
 import torchvision.transforms as T
 
 
+# ColorJitter randomly changes their brightness, contrast, saturation and hue
 class DeviceAgnosticColorJitter(T.ColorJitter):
     def __init__(self, brightness=0, contrast=0, saturation=0, hue=0):
         """This is the same as T.ColorJitter but it only accepts batches of images and works on GPU"""
@@ -17,6 +18,7 @@ class DeviceAgnosticColorJitter(T.ColorJitter):
         assert augmented_images.shape == torch.Size([B, C, H, W])
         return augmented_images
 
+# Crop a random portion of image and resize it to a given size.
 class DeviceAgnosticRandomResizedCrop(T.RandomResizedCrop):
     def __init__(self, size, scale):
         """This is the same as T.RandomResizedCrop but it only accepts batches of images and works on GPU"""

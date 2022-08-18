@@ -47,7 +47,10 @@ def test(args, eval_ds, model):
     
     logging.debug("Calculating recalls")
     _, predictions = faiss_index.search(queries_descriptors, max(RECALL_VALUES))
-    
+
+    ### re-ranking is going to be added here
+
+
     #### For each query, check if the predictions are correct
     positives_per_query = eval_ds.get_positives()
     recalls = np.zeros(len(RECALL_VALUES))
@@ -60,4 +63,3 @@ def test(args, eval_ds, model):
     recalls = recalls / eval_ds.queries_num * 100
     recalls_str = ", ".join([f"R@{val}: {rec:.1f}" for val, rec in zip(RECALL_VALUES, recalls)])
     return recalls, recalls_str
-

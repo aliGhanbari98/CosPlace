@@ -32,6 +32,14 @@ class GeoLocalizationNet(nn.Module):
         x = self.aggregation(x)
         return x
 
+    def multi_scale(self, images):
+        compressed = []  # compress images
+        new_images = [images, compressed]
+        images1 = self(new_images[0])
+        images2 = self(new_images[1])
+        # merge images1 and images2
+
+
 
 def get_backbone(backbone_name):
     if backbone_name.startswith("resnet"):
