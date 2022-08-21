@@ -47,7 +47,7 @@ class GeoLocalizationNet(nn.Module):
             #following lines for when concatenating the descriptors
             descriptors = [self.aggregation(z) for z in first_stage]
             descriptors = torch.cat(tuple(descriptors),dim=1)
-            print("the dimension of descriptors after concatinating tensors: " , descriptors.shape)
+            #print("the dimension of descriptors after concatinating tensors: torch.Size([16, 1536])" , descriptors.shape)
             return descriptors
         else:
             x = self.backbone(x)
