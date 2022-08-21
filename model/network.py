@@ -5,7 +5,8 @@ import torchvision
 from torch import nn
 
 from model.layers import Flatten, L2Norm, GeM
-
+import augmentations
+import parser
 
 CHANNELS_NUM_IN_LAST_CONV = {
         "resnet18": 512,
@@ -14,6 +15,7 @@ CHANNELS_NUM_IN_LAST_CONV = {
         "vgg16": 512,
     }
 
+args = parser.parse_arguments()
 
 class GeoLocalizationNet(nn.Module):
     def __init__(self, backbone, fc_output_dim):
@@ -28,10 +30,21 @@ class GeoLocalizationNet(nn.Module):
             )
     
     def forward(self, x):
-        x = self.backbone(x)
-        x = self.aggregation(x)
-        return x
-
+        # for multiscale - addedd by AB
+        if args.run_multiscale == 1:
+            blur_scales = [augmentations.CustomGaussianBlur(kernel_size=(13,13), sigma=x) for x in (1,3,20)]
+            scaled_images = [blur_scales[i](x) for i in range(3)]
+            first_stage = [self.backbone(y) for y in scaled_images]
+            descriptors = [self.aggregation(z).unsqueeze(0) for z in first_stage]
+            descriptors = torch.cat(tuple(descriptors),dim=0)
+            mean_descriptor = torch.mean(descriptors,dim=0)
+            return mean_descriptor
+        else:
+            x = self.backbone(x)
+            print("the shape of descriptors after backbone:", x.shape)
+            x = self.aggregation(x)
+            print("the shape of descriptors after aggreggation:", x.shape)
+            return x
 
 def get_backbone(backbone_name):
     if backbone_name.startswith("resnet"):

@@ -6,6 +6,7 @@ import argparse
 def parse_arguments(is_training=True):
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     # CosPlace Groups parameters
+    parser.add_argument("--run_multiscale",type=int,default=0,help="to test multiscale code pass 1")
     parser.add_argument("--M", type=int, default=10, help="_")
     parser.add_argument("--alpha", type=int, default=30, help="_")
     parser.add_argument("--N", type=int, default=5, help="_")
