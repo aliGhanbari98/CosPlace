@@ -35,13 +35,20 @@ class GeoLocalizationNet(nn.Module):
             blur_scales = [augmentations.CustomGaussianBlur(kernel_size=(13,13), sigma=x) for x in (1,3,20)]
             scaled_images = [blur_scales[i](x) for i in range(3)]
             first_stage = [self.backbone(y) for y in scaled_images]
-            descriptors = [self.aggregation(z).unsqueeze(0) for z in first_stage]
-            descriptors = torch.cat(tuple(descriptors),dim=0)
-            #print("the dimension of descriptors after torch cat: " , descriptors.shape)
-            #torch.Size([3, 16, 512])
-            mean_descriptor = torch.mean(descriptors,dim=0)
+            #following lines for when we want to average the descriptors
+            # descriptors = [self.aggregation(z).unsqueeze(0) for z in first_stage]
+            # descriptors = torch.cat(tuple(descriptors),dim=0)
+            #### print("the dimension of descriptors after torch cat: " , descriptors.shape)
+            #### torch.Size([3, 16, 512])
+            #mean_descriptor = torch.mean(descriptors,dim=0)
             #print("the dimension of descriptors after mean: ", mean_descriptor.shape)
-            return mean_descriptor
+            #return mean_descriptor
+
+            #following lines for when concatenating the descriptors
+            descriptors = [self.aggregation(z) for z in first_stage]
+            descriptors = torch.cat(tuple(descriptors),dim=1)
+            print("the dimension of descriptors after concatinating tensors: " , descriptors.shape)
+            return descriptors
         else:
             x = self.backbone(x)
             #print("the shape of descriptors after backbone: torch.Size([16, 512, 16, 16])", x.shape)
