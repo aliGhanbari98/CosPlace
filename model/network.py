@@ -40,7 +40,7 @@ class GeoLocalizationNet(nn.Module):
             print("the dimension of descriptors after torch cat: " , descriptors.shape)
             #torch.Size([3, 16, 512])
             mean_descriptor = torch.mean(descriptors,dim=0)
-            print("the dimension of descriptors after mean: ", mean_descriptor.shape)
+            #print("the dimension of descriptors after mean: ", mean_descriptor.shape)
             return mean_descriptor
         else:
             x = self.backbone(x)
