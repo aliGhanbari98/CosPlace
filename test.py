@@ -21,9 +21,9 @@ def test(args, eval_ds, model):
         database_subset_ds = Subset(eval_ds, list(range(eval_ds.database_num)))
         database_dataloader = DataLoader(dataset=database_subset_ds, num_workers=args.num_workers,
                                         batch_size=args.infer_batch_size, pin_memory=(args.device=="cuda"))
-        #all_descriptors = np.empty((len(eval_ds), args.fc_output_dim), dtype="float32")
+        all_descriptors = np.empty((len(eval_ds), args.fc_output_dim), dtype="float32")
         #for when concatenating descriptors
-        all_descriptors = np.empty((len(eval_ds), args.concat_dim), dtype="float32")
+        #all_descriptors = np.empty((len(eval_ds), args.concat_dim), dtype="float32")
         for images, indices in tqdm(database_dataloader, ncols=100):
             descriptors = model(images.to(args.device))
             descriptors = descriptors.cpu().numpy()
@@ -43,9 +43,9 @@ def test(args, eval_ds, model):
     database_descriptors = all_descriptors[:eval_ds.database_num]
     
     # Use a kNN to find predictions
-    #faiss_index = faiss.IndexFlatL2(args.fc_output_dim)
+    faiss_index = faiss.IndexFlatL2(args.fc_output_dim)
     #for concat descriptors:
-    faiss_index = faiss.IndexFlatL2(args.concat_dim)
+    #faiss_index = faiss.IndexFlatL2(args.concat_dim)
     faiss_index.add(database_descriptors)
     del database_descriptors, all_descriptors
     
