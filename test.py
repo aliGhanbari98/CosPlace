@@ -43,7 +43,9 @@ def test(args, eval_ds, model):
     database_descriptors = all_descriptors[:eval_ds.database_num]
     
     # Use a kNN to find predictions
-    faiss_index = faiss.IndexFlatL2(args.fc_output_dim)
+    #faiss_index = faiss.IndexFlatL2(args.fc_output_dim)
+    #for concat descriptors:
+    faiss_index = faiss.IndexFlatL2(args.concat_dim)
     faiss_index.add(database_descriptors)
     del database_descriptors, all_descriptors
     
