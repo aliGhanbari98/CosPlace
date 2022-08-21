@@ -39,7 +39,7 @@ class CustomGaussianBlur(T.GaussianBlur):
         if len(images.shape) == 4: 
             B, C, H, W = images.shape
             blur1_images = [gaussianblur(img).unsqueeze(0) for img in images]
-            print("the shape of one image after blur in batch mode: ",blur1_images[0].shape)
+            #print("the shape of one image after blur in batch mode: ",blur1_images[0].shape)
             blur1_images = torch.cat(blur1_images)
             return blur1_images
         elif len(images.shape) == 3:
