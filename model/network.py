@@ -37,13 +37,14 @@ class GeoLocalizationNet(nn.Module):
             first_stage = [self.backbone(y) for y in scaled_images]
             descriptors = [self.aggregation(z).unsqueeze(0) for z in first_stage]
             descriptors = torch.cat(tuple(descriptors),dim=0)
+            print("the dimension of descriptors after torch cat: " , descriptors.shape)
             mean_descriptor = torch.mean(descriptors,dim=0)
             return mean_descriptor
         else:
             x = self.backbone(x)
-            print("the shape of descriptors after backbone:", x.shape)
+            #print("the shape of descriptors after backbone: torch.Size([16, 512, 16, 16])", x.shape)
             x = self.aggregation(x)
-            print("the shape of descriptors after aggreggation:", x.shape)
+            #print("the shape of descriptors after aggreggation: torch.Size([16, 512])", x.shape)
             return x
 
 def get_backbone(backbone_name):
