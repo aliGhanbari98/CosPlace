@@ -112,6 +112,8 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
     epoch_losses = np.zeros((0,1), dtype=np.float32)
     for iteration in tqdm(range(args.iterations_per_epoch), ncols=100):
         images, targets, _ = next(dataloader_iterator)
+        print("images: " , images)
+        print("targets: ", targets)
         images, targets = images.to(args.device), targets.to(args.device)
         
         if args.augmentation_device == "cuda":
