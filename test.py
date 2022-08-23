@@ -53,7 +53,7 @@ def test(args, eval_ds, model):
 
     #### For each query, check if the predictions are correct
     positives_per_query = eval_ds.get_positives()
-    print(predictions[3], positives_per_query[3])
+    print("predictions[3]", predictions[3], positives_per_query[3])
     recalls = np.zeros(len(RECALL_VALUES))
     for query_index, preds in enumerate(predictions):
         for i, n in enumerate(RECALL_VALUES):
