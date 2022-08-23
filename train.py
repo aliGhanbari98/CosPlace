@@ -119,7 +119,6 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
         if args.run_multiscale == 2:
             targets = targets.repeat(3)
 
-        print("targets shape: ", targets.shape)
         images, targets = images.to(args.device), targets.to(args.device)
         
         if args.augmentation_device == "cuda":
