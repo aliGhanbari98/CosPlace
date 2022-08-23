@@ -56,7 +56,7 @@ class GeoLocalizationNet(nn.Module):
             first_stage = [self.backbone(y) for y in scaled_images]
             descriptors = [self.aggregation(z) for z in first_stage]
             descriptors = torch.cat(tuple(descriptors),dim=0)
-            print("shape after concat: " , descriptors.shape)
+            #print("shape after concat: shape after concat:  torch.Size([96, 512])" , descriptors.shape)
             return descriptors
 
 

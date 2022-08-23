@@ -112,8 +112,14 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
     epoch_losses = np.zeros((0,1), dtype=np.float32)
     for iteration in tqdm(range(args.iterations_per_epoch), ncols=100):
         images, targets, _ = next(dataloader_iterator)
-        print("images: " , images.shape)
-        print("targets: ", targets.shape)
+
+        #print("images: torch.Size([32, 3, 512, 512])" , images.shape)
+        #print("targets: torch.Size([32])", targets.shape)
+
+        if args.run_multiscale == 2:
+            targets = targets.repeat(3)
+
+        print("targets shape: ", targets.shape)
         images, targets = images.to(args.device), targets.to(args.device)
         
         if args.augmentation_device == "cuda":
