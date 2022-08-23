@@ -50,7 +50,7 @@ class GeoLocalizationNet(nn.Module):
             #print("the dimension of descriptors after concatinating tensors: torch.Size([16, 1536])" , descriptors.shape)
             #return descriptors
 
-        elif args.run_multiscale == 2:
+        elif args.run_multiscale == 2 and self.training:
             blur_scales = [augmentations.CustomGaussianBlur(kernel_size=(13,13), sigma=x) for x in (1,3,20)]
             scaled_images = [blur_scales[i](x) for i in range(3)]
             first_stage = [self.backbone(y) for y in scaled_images]
@@ -59,6 +59,10 @@ class GeoLocalizationNet(nn.Module):
             #print("shape after concat: shape after concat:  torch.Size([96, 512])" , descriptors.shape)
             return descriptors
 
+        elif args.run_multiscale == 2 and not self.training:
+            x = self.backbone(x)
+            x = self.aggregation(x)
+            return x
 
         else:
             x = self.backbone(x)
