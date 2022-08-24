@@ -92,6 +92,7 @@ def test(args, eval_ds, model):
         predictions_utms = []
         predictions_utms.append(eval_ds.database_utms[query_index])
         reranked_predictions = re_ranking(predictions_utms, preds, args.reranking_minimum_distance)
+        print(reranked_predictions)
         for i, n in enumerate(RECALL_VALUES):
             if np.any(np.in1d(reranked_predictions[:n], positives_per_query[query_index])):
                 recalls[i:] += 1
