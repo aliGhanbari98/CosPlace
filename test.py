@@ -6,10 +6,46 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import Subset
+from math import sqrt
 
 
 # Compute R@1, R@5, R@10, R@20
 RECALL_VALUES = [1, 5, 10, 20]
+
+def measureDistance (x,y):
+  return sqrt(((x[0]-y[0]) ** 2) + ((x[1] - y[1])** 2))
+
+
+def in_list(item,L):
+  for i in L:
+      if item in i:
+          return L.index(i)
+  return -1
+
+
+def re_ranking(utms, predictions, dist_threshold):
+    result = np.array([])
+    for i, pred_i in enumerate(utms):
+        for j, pred_j in enumerate(utms):
+            if i == j: continue
+            if measureDistance(pred_i, pred_j) < dist_threshold:
+                found_index = in_list(j, result)
+                if found_index != -1:
+                    if i not in result[found_index]:
+                        result[found_index].append(i)
+                    break
+                else:
+                    result.append([i, j])
+                    break
+            else:
+                result.append([i])
+                break
+    sorted_result = sorted(result, key=lambda ele: len(ele), reverse=True)
+    flatted_result = [item for sublist in sorted_result for item in sublist]
+    new_predictions = []
+    for pred_index in flatted_result:
+        new_predictions.append(predictions[pred_index])
+    return new_predictions
 
 
 def test(args, eval_ds, model):
@@ -50,11 +86,17 @@ def test(args, eval_ds, model):
 
     ### re-ranking is going to be added here
 
+    predictions_utms = []
+    for pred_index, pred in enumerate(predictions):
+        predictions_utms.append(eval_ds.database_num[pred_index])
+
+    reranked_predictions = re_ranking(predictions_utms, predictions, args.reranking_minimum_distance)
+
 
     #### For each query, check if the predictions are correct
     positives_per_query = eval_ds.get_positives()
     recalls = np.zeros(len(RECALL_VALUES))
-    for query_index, preds in enumerate(predictions):
+    for query_index, preds in enumerate(reranked_predictions):
         print(f"UTMS{query_index}", eval_ds.database_utms[query_index])
         for i, n in enumerate(RECALL_VALUES):
             if np.any(np.in1d(preds[:n], positives_per_query[query_index])):
@@ -64,3 +106,4 @@ def test(args, eval_ds, model):
     recalls = recalls / eval_ds.queries_num * 100
     recalls_str = ", ".join([f"R@{val}: {rec:.1f}" for val, rec in zip(RECALL_VALUES, recalls)])
     return recalls, recalls_str
+
