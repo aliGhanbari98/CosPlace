@@ -88,7 +88,7 @@ def test(args, eval_ds, model):
 
     predictions_utms = []
     for pred_index, pred in enumerate(predictions):
-        predictions_utms.append(eval_ds.database_num[pred_index])
+        predictions_utms.append(eval_ds.database_utms[pred_index])
 
     reranked_predictions = re_ranking(predictions_utms, predictions, args.reranking_minimum_distance)
 
