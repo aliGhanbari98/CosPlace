@@ -24,7 +24,7 @@ def in_list(item,L):
 
 
 def re_ranking(utms, predictions, dist_threshold):
-    result = np.array([])
+    result = []
     for i, pred_i in enumerate(utms):
         for j, pred_j in enumerate(utms):
             if i == j: continue
