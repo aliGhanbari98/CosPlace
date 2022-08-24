@@ -84,25 +84,16 @@ def test(args, eval_ds, model):
     logging.debug("Calculating recalls")
     _, predictions = faiss_index.search(queries_descriptors, max(RECALL_VALUES))
 
-    ### re-ranking is going to be added here
-
-    predictions_utms = []
-    for pred_index, pred in enumerate(predictions):
-        predictions_utms.append(eval_ds.database_utms[pred_index])
-
-    reranked_predictions = re_ranking(predictions_utms, predictions, args.reranking_minimum_distance)
-
-    print('original : ', predictions[:100])
-    print('re-ranked : ', reranked_predictions[:100])
-
 
     #### For each query, check if the predictions are correct
     positives_per_query = eval_ds.get_positives()
     recalls = np.zeros(len(RECALL_VALUES))
-    for query_index, preds in enumerate(reranked_predictions):
-        print(f"UTMS{query_index}", eval_ds.database_utms[query_index])
+    for query_index, preds in enumerate(predictions):
+        predictions_utms = []
+        predictions_utms.append(eval_ds.database_utms[query_index])
+        reranked_predictions = re_ranking(predictions_utms, preds, args.reranking_minimum_distance)
         for i, n in enumerate(RECALL_VALUES):
-            if np.any(np.in1d(preds[:n], positives_per_query[query_index])):
+            if np.any(np.in1d(reranked_predictions[:n], positives_per_query[query_index])):
                 recalls[i:] += 1
                 break
     # Divide by queries_num and multiply by 100, so the recalls are in percentages
