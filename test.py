@@ -92,6 +92,9 @@ def test(args, eval_ds, model):
 
     reranked_predictions = re_ranking(predictions_utms, predictions, args.reranking_minimum_distance)
 
+    print('original : ', predictions[:100])
+    print('re-ranked : ', reranked_predictions[:100])
+
 
     #### For each query, check if the predictions are correct
     positives_per_query = eval_ds.get_positives()
