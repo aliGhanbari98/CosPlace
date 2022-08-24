@@ -90,7 +90,8 @@ def test(args, eval_ds, model):
     recalls = np.zeros(len(RECALL_VALUES))
     for query_index, preds in enumerate(predictions):
         predictions_utms = []
-        predictions_utms.append(eval_ds.database_utms[query_index])
+        for pred_index, _ in enumerate(preds):
+            predictions_utms.append(eval_ds.database_utms[pred_index])
         reranked_predictions = re_ranking(predictions_utms, preds, args.reranking_minimum_distance)
         print(reranked_predictions)
         for i, n in enumerate(RECALL_VALUES):
