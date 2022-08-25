@@ -13,7 +13,7 @@ from math import sqrt
 RECALL_VALUES = [1, 5, 10, 20]
 
 def measureDistance (x,y):
-  return sqrt(((x[0]-y[0]) ** 2) + ((x[1] - y[1])** 2))
+  return sqrt(((x[0]-y[0]) ** 2) + ((x[1] - y[1]) ** 2))
 
 
 def in_list(item,L):
@@ -28,7 +28,8 @@ def re_ranking(utms, predictions, dist_threshold):
     for i, pred_i in enumerate(utms):
         for j, pred_j in enumerate(utms):
             if i == j: continue
-            if measureDistance(pred_i, pred_j) < dist_threshold:
+            # if measureDistance(pred_i, pred_j) < dist_threshold:
+            if abs(pred_i[0] - pred_j[1]) < 5 and abs(pred_i[1] - pred_j[1] < 100):
                 found_index = in_list(j, result)
                 if found_index != -1:
                     if i not in result[found_index]:
@@ -93,7 +94,6 @@ def test(args, eval_ds, model):
         for _, image_index in enumerate(preds):
             predictions_utms.append(eval_ds.database_utms[image_index])
         reranked_predictions = re_ranking(predictions_utms, preds, args.reranking_minimum_distance)
-        print(reranked_predictions)
         for i, n in enumerate(RECALL_VALUES):
             if np.any(np.in1d(reranked_predictions[:n], positives_per_query[query_index])):
                 recalls[i:] += 1
@@ -102,4 +102,3 @@ def test(args, eval_ds, model):
     recalls = recalls / eval_ds.queries_num * 100
     recalls_str = ", ".join([f"R@{val}: {rec:.1f}" for val, rec in zip(RECALL_VALUES, recalls)])
     return recalls, recalls_str
-
