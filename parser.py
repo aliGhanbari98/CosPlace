@@ -57,6 +57,8 @@ def parse_arguments(is_training=True):
                         help="path of the folder with train/val/test sets")
     parser.add_argument("--save_dir", type=str, default="default",
                         help="name of directory on which to save the logs, under logs/save_dir")
+    parser.add_argument("--reranking_minimum_distance", type=int, default=10,
+                        help="distance in meters for two predictions to be considered in the same place")
     
     args = parser.parse_args()
     

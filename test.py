@@ -6,10 +6,47 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import Subset
+from math import sqrt
 
 
 # Compute R@1, R@5, R@10, R@20
 RECALL_VALUES = [1, 5, 10, 20]
+
+def measureDistance (x,y):
+  return sqrt(((x[0]-y[0]) ** 2) + ((x[1] - y[1]) ** 2))
+
+
+def in_list(item,L):
+  for i in L:
+      if item in i:
+          return L.index(i)
+  return -1
+
+
+def re_ranking(utms, predictions, dist_threshold):
+    result = []
+    for i, pred_i in enumerate(utms):
+        for j, pred_j in enumerate(utms):
+            if i == j: continue
+            # if measureDistance(pred_i, pred_j) < dist_threshold:
+            if abs(pred_i[0] - pred_j[1]) < 5 and abs(pred_i[1] - pred_j[1] < 100):
+                found_index = in_list(j, result)
+                if found_index != -1:
+                    if i not in result[found_index]:
+                        result[found_index].append(i)
+                    break
+                else:
+                    result.append([i, j])
+                    break
+            else:
+                result.append([i])
+                break
+    sorted_result = sorted(result, key=lambda ele: len(ele), reverse=True)
+    flatted_result = [item for sublist in sorted_result for item in sublist]
+    new_predictions = []
+    for pred_index in flatted_result:
+        new_predictions.append(predictions[pred_index])
+    return new_predictions
 
 
 def test(args, eval_ds, model):
@@ -51,17 +88,21 @@ def test(args, eval_ds, model):
     
     logging.debug("Calculating recalls")
     _, predictions = faiss_index.search(queries_descriptors, max(RECALL_VALUES))
-    
+
+
     #### For each query, check if the predictions are correct
     positives_per_query = eval_ds.get_positives()
     recalls = np.zeros(len(RECALL_VALUES))
     for query_index, preds in enumerate(predictions):
+        predictions_utms = []
+        for _, image_index in enumerate(preds):
+            predictions_utms.append(eval_ds.database_utms[image_index])
+        reranked_predictions = re_ranking(predictions_utms, preds, args.reranking_minimum_distance)
         for i, n in enumerate(RECALL_VALUES):
-            if np.any(np.in1d(preds[:n], positives_per_query[query_index])):
+            if np.any(np.in1d(reranked_predictions[:n], positives_per_query[query_index])):
                 recalls[i:] += 1
                 break
     # Divide by queries_num and multiply by 100, so the recalls are in percentages
     recalls = recalls / eval_ds.queries_num * 100
     recalls_str = ", ".join([f"R@{val}: {rec:.1f}" for val, rec in zip(RECALL_VALUES, recalls)])
     return recalls, recalls_str
-

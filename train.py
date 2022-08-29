@@ -128,7 +128,7 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
         classifiers_optimizers[current_group_num].zero_grad()
         
         if not args.use_amp16:
-            descriptors = model(images)
+            descriptors = model(images) # change this to mode.multi_scale(images)
             output = classifiers[current_group_num](descriptors, targets)
             loss = criterion(output, targets)
             loss.backward()
@@ -180,4 +180,3 @@ recalls, recalls_str = test.test(args, test_ds, model)
 logging.info(f"{test_ds}: {recalls_str}")
 
 logging.info("Experiment finished (without any errors)")
-
